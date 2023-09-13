@@ -120,8 +120,9 @@ const postsSlice = createSlice({
   },
 });
 
-export const getPostById = (state: RootState, postId: string) =>
-  state.posts.posts.find((post) => post.id === postId);
+export const getPostById = (state: RootState, postId: string) => {
+  return state.posts.posts.find((post) => Number(post.id) === Number(postId));
+};
 
 export const postsSelector = (state: RootState) => state.posts;
 

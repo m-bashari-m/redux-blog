@@ -3,12 +3,12 @@ import PostAuthor from "./PostAuthor";
 import TimeAgo from "./TimeAgo";
 import ReactionButtons from "./ReactionButtons";
 import { useAppSelector } from "../../hooks/hooks";
+import { useParams } from "react-router-dom";
 
 const SinglePostPage = () => {
-  const postId = "10";
+  const { postId } = useParams();
 
-  const post = useAppSelector((state) => getPostById(state, postId));
-
+  const post = useAppSelector((state) => getPostById(state, String(postId)));
   if (!post) {
     return (
       <section>
