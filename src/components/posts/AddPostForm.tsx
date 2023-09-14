@@ -1,11 +1,14 @@
 import { ChangeEvent, useState } from "react";
-import { addNewPost } from "../../store/slices/postsSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { usersSelector } from "../../store/slices/usersSlice";
+import { addNewPost } from "../../store/slices/postsExtraReducers";
+import { useNavigate } from "react-router-dom";
 
 const AddPostForm = () => {
   const dispatch = useAppDispatch();
   const users = useAppSelector(usersSelector);
+
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -31,6 +34,7 @@ const AddPostForm = () => {
         setTitle("");
         setContent("");
         setUserId("");
+        navigate("/");
       } catch (err) {
         console.error("Failed to save the post", err);
       } finally {

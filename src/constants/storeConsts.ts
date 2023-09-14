@@ -7,3 +7,5 @@ export const initialReactions: Reactions = {
   heart: 0,
   coffee: 0,
 };
+
+export const POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
