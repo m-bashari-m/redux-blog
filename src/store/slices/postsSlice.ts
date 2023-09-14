@@ -1,5 +1,5 @@
-import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
-import { Post, PostsSliceType, RootState, StringReactions } from "../types";
+import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { PostsSliceType, RootState, StringReactions } from "../types";
 import { postsExtraReducers } from "./postsExtraReducers";
 
 const initialState: PostsSliceType = {
@@ -12,29 +12,6 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    postAdded: {
-      reducer(state, action: PayloadAction<Post>) {
-        state.posts.push(action.payload);
-      },
-      prepare(title: string, body: string, userId: string) {
-        return {
-          payload: {
-            id: nanoid(),
-            title,
-            body,
-            date: new Date().toISOString(),
-            userId,
-            reactions: {
-              thumbsUp: 0,
-              wow: 0,
-              heart: 0,
-              rocket: 0,
-              coffee: 0,
-            },
-          },
-        };
-      },
-    },
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload;
       const existingPost = state.posts.find((post) => post.id === postId);
@@ -52,6 +29,11 @@ export const getPostById = (state: RootState, postId: string) => {
 
 export const postsSelector = (state: RootState) => state.posts;
 
-export const { postAdded, reactionAdded } = postsSlice.actions;
+export const selectPostsByUser = createSelector(
+  [postsSelector, (_, userId) => userId],
+  (posts, userId) => posts.posts.filter((post) => post.userId === userId)
+);
+
+export const { reactionAdded } = postsSlice.actions;
 
 export default postsSlice.reducer;

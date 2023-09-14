@@ -4,7 +4,7 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit";
 import axios from "axios";
-import { POSTS_URL } from "../../constants/storeConsts";
+import { POSTS_URL, initialReactions } from "../../constants/storeConsts";
 import { Post, PostsSliceType } from "../types";
 import { sub } from "date-fns";
 
@@ -92,13 +92,7 @@ export const postsExtraReducers = (
 
       action.payload.userId = Number(action.payload.userId);
       action.payload.date = new Date().toISOString();
-      action.payload.reactions = {
-        thumbsUp: 0,
-        hooray: 0,
-        heart: 0,
-        rocket: 0,
-        eyes: 0,
-      };
+      action.payload.reactions = initialReactions;
       state.posts.push(action.payload);
     })
     .addCase(updatePost.pending, (state) => {
