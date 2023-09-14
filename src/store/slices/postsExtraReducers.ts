@@ -71,7 +71,11 @@ export const postsExtraReducers = (
       state.status = "failed";
       state.error = action.error.message;
     })
+    .addCase(addNewPost.pending, (state) => {
+      state.status = "loading";
+    })
     .addCase(addNewPost.fulfilled, (state, action) => {
+      state.status = "succeeded";
       // Fix for API post IDs:
       // Creating sortedPosts & assigning the id
       // would be not be needed if the fake API
@@ -97,6 +101,9 @@ export const postsExtraReducers = (
       };
       state.posts.push(action.payload);
     })
+    .addCase(updatePost.pending, (state) => {
+      state.status = "loading";
+    })
     .addCase(updatePost.fulfilled, (state, action: PayloadAction<Post>) => {
       state.status = "succeeded";
       if (!action.payload?.id) {
@@ -108,7 +115,11 @@ export const postsExtraReducers = (
       const posts = state.posts.filter((post) => post.id !== id);
       state.posts = [...posts, action.payload];
     })
+    .addCase(deletePost.pending, (state) => {
+      state.status = "loading";
+    })
     .addCase(deletePost.fulfilled, (state, action) => {
+      state.status = "succeeded";
       if (typeof action.payload === "string") {
         console.log("Delete could not complete");
         console.log(action.payload);
