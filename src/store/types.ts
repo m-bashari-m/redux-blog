@@ -1,3 +1,4 @@
+import { EntityState } from "@reduxjs/toolkit";
 import { store } from "./store";
 
 export type RootState = ReturnType<typeof store.getState>;
@@ -22,10 +23,9 @@ export type Post = {
   reactions: Reactions;
 };
 
-export type PostsSliceType = {
-  posts: Post[];
-  status: AsyncStatus;
-  error: string | undefined;
+export type PostsSliceType = EntityState<Post> & {
+  status: string;
+  error?: string;
 };
 
 export type Reactions = {

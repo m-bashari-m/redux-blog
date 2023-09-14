@@ -1,12 +1,19 @@
-import { createSelector, createSlice } from "@reduxjs/toolkit";
-import { PostsSliceType, RootState, StringReactions } from "../types";
+import {
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+} from "@reduxjs/toolkit";
+import { Post, RootState, StringReactions } from "../types";
 import { postsExtraReducers } from "./postsExtraReducers";
 
-const initialState: PostsSliceType = {
-  posts: [],
+export const postsAdapter = createEntityAdapter<Post>({
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+});
+
+const initialState = postsAdapter.getInitialState({
   status: "idle",
   error: undefined,
-};
+});
 
 const postsSlice = createSlice({
   name: "posts",
@@ -14,7 +21,7 @@ const postsSlice = createSlice({
   reducers: {
     reactionAdded(state, action) {
       const { postId, reaction } = action.payload;
-      const existingPost = state.posts.find((post) => post.id === postId);
+      const existingPost = state.entities[postId];
       if (existingPost) {
         existingPost.reactions[reaction as StringReactions]++;
       }
@@ -23,16 +30,20 @@ const postsSlice = createSlice({
   extraReducers: postsExtraReducers,
 });
 
-export const getPostById = (state: RootState, postId: string) => {
-  return state.posts.posts.find((post) => Number(post.id) === Number(postId));
-};
-
-export const postsSelector = (state: RootState) => state.posts;
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostsById,
+  selectIds: selectPostIds,
+} = postsAdapter.getSelectors((state: RootState) => state.posts);
 
 export const selectPostsByUser = createSelector(
-  [postsSelector, (_, userId) => userId],
-  (posts, userId) => posts.posts.filter((post) => post.userId === userId)
+  [selectAllPosts, (_, userId) => userId],
+  (posts, userId) => posts.filter((post) => post.userId === userId)
 );
+
+export const selectPostsError = (state: RootState) => state.posts.error;
+
+export const selectPostsStatus = (state: RootState) => state.posts.status;
 
 export const { reactionAdded } = postsSlice.actions;
 

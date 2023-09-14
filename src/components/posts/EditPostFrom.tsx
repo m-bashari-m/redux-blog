@@ -2,16 +2,19 @@ import { ChangeEvent, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usersSelector } from "../../store/slices/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { getPostById } from "../../store/slices/postsSlice";
 import { deletePost, updatePost } from "../../store/slices/postsExtraReducers";
 import { Reactions } from "../../store/types";
+import { selectPostsById } from "../../store/slices/postsSlice";
+import { EntityId } from "@reduxjs/toolkit";
 
 const EditPostForm = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
-  const post = useAppSelector((state) => getPostById(state, String(postId)));
+  const post = useAppSelector((state) =>
+    selectPostsById(state, postId as EntityId)
+  );
   const users = useAppSelector(usersSelector);
 
   const [title, setTitle] = useState(post?.title);

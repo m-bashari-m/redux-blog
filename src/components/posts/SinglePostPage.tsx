@@ -1,14 +1,17 @@
-import { getPostById } from "../../store/slices/postsSlice";
+import { selectPostsById } from "../../store/slices/postsSlice";
 import PostAuthor from "./PostAuthor";
 import TimeAgo from "./TimeAgo";
 import ReactionButtons from "./ReactionButtons";
 import { useAppSelector } from "../../hooks/hooks";
 import { Link, useParams } from "react-router-dom";
+import { EntityId } from "@reduxjs/toolkit";
 
 const SinglePostPage = () => {
   const { postId } = useParams();
 
-  const post = useAppSelector((state) => getPostById(state, String(postId)));
+  const post = useAppSelector((state) =>
+    selectPostsById(state, postId as EntityId)
+  );
   if (!post) {
     return (
       <section>

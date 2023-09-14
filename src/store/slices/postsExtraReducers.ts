@@ -7,6 +7,7 @@ import axios from "axios";
 import { POSTS_URL, initialReactions } from "../../constants/storeConsts";
 import { Post, PostsSliceType } from "../types";
 import { sub } from "date-fns";
+import { postsAdapter } from "./postsSlice";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   const response = await axios.get(POSTS_URL);
@@ -64,7 +65,7 @@ export const postsExtraReducers = (
       });
 
       // Add any fetched posts to the array
-      state.posts = state.posts.concat(loadedPosts);
+      postsAdapter.upsertMany(state, loadedPosts);
     })
 
     .addCase(fetchPosts.rejected, (state, action) => {
@@ -76,24 +77,12 @@ export const postsExtraReducers = (
     })
     .addCase(addNewPost.fulfilled, (state, action) => {
       state.status = "succeeded";
-      // Fix for API post IDs:
-      // Creating sortedPosts & assigning the id
-      // would be not be needed if the fake API
-      // returned accurate new post IDs
-      const sortedPosts = state.posts.sort((a, b) => {
-        if (a.id > b.id) return 1;
-        if (a.id < b.id) return -1;
-        return 0;
-      });
-      action.payload.id = String(
-        Number(sortedPosts[sortedPosts.length - 1].id) + 1
-      );
-      // End fix for fake API post IDs
 
       action.payload.userId = Number(action.payload.userId);
       action.payload.date = new Date().toISOString();
       action.payload.reactions = initialReactions;
-      state.posts.push(action.payload);
+
+      postsAdapter.addOne(state, action.payload);
     })
     .addCase(updatePost.pending, (state) => {
       state.status = "loading";
@@ -104,10 +93,7 @@ export const postsExtraReducers = (
         console.log("update colud not complete");
         return;
       }
-      const { id } = action.payload;
-      // action.payload.date = new Date().toISOString();
-      const posts = state.posts.filter((post) => post.id !== id);
-      state.posts = [...posts, action.payload];
+      postsAdapter.upsertOne(state, action.payload);
     })
     .addCase(deletePost.pending, (state) => {
       state.status = "loading";
@@ -119,8 +105,6 @@ export const postsExtraReducers = (
         console.log(action.payload);
         return;
       }
-      const { id } = action.payload;
-      const posts = state.posts.filter((post) => post.id !== id);
-      state.posts = posts;
+      postsAdapter.removeOne(state, action.payload.id);
     });
 };

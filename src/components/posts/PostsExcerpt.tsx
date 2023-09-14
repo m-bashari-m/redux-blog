@@ -1,14 +1,20 @@
 import PostAuthor from "./PostAuthor";
 import TimeAgo from "./TimeAgo";
 import ReactionButtons from "./ReactionButtons";
-import { Post } from "../../store/types";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../hooks/hooks";
+import { selectPostsById } from "../../store/slices/postsSlice";
+import { EntityId } from "@reduxjs/toolkit";
 
 interface postsExcerptProps {
-  post: Post;
+  postId: EntityId;
 }
 
-const PostsExcerpt: React.FC<postsExcerptProps> = ({ post }) => {
+const PostsExcerpt: React.FC<postsExcerptProps> = ({ postId }) => {
+  const post = useAppSelector((state) => selectPostsById(state, postId));
+
+  if (!post) return <h2>Post Not Found!</h2>;
+
   return (
     <article>
       <h2>{post.title}</h2>
